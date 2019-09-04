@@ -42,9 +42,7 @@ const fee_extractor = async function(uid, pwd, callback) {
 			data.Notices.push({
 				html: $.html()
 			})
-			// console.log(data)
-			// console.log("scraper_-_")
-
+			
 			callback(data.Notices[0].html, uid)
 		})
 	})
