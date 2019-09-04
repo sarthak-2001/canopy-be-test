@@ -51,10 +51,7 @@ const fee_extractor = async function(uid, pwd, callback) {
 	})
 }
 
-// console.log("start")
-// fee_extractor("b418045", "sarthak@2001", data_writer)
 
-// console.log('end');
 
 module.exports = {fee_extractor:fee_extractor,
 					data_writer: data_writer}
