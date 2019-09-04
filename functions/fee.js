@@ -1,6 +1,6 @@
 const request = require("request")
 const cheerio = require("cheerio")
-const login = require("./login")
+const login_old = require("./login_old")
 const Fee = require("../models/fee")
 // require("../db/mongoose")
 
@@ -12,21 +12,20 @@ const lock_true = async function(uid) {
 	// Fee.updateOne()
 }
 // lock_true('b418045')
-const data_writer = async (d,uid) => {
-	
-	const now = new Date();
+const data_writer = async (d, uid) => {
+	const now = new Date()
 
-	const fee = await Fee.findOneAndUpdate({ studentID: uid }, { lock: false, data:d,last_updated: now })
-	console.log('all done');
-	
+	const fee = await Fee.findOneAndUpdate({ studentID: uid }, { lock: false, data: d, last_updated: now })
+	console.log("all done")
 }
 
 const fee_extractor = async function(uid, pwd, callback) {
-	await lock_true("b418045")
+	await lock_true(uid)
 	// console.log("uff")
 
-	login(uid, pwd, (cookie) => {
+	login_old(uid, pwd, (cookie) => {
 		// console.log(cookie);
+		console.log("in login_old")
 
 		let option = {
 			url: "https://hib.iiit-bh.ac.in/Hibiscus/Fees/stuFee.php?stuid=" + uid,
@@ -46,15 +45,11 @@ const fee_extractor = async function(uid, pwd, callback) {
 			// console.log(data)
 			// console.log("scraper_-_")
 
-			callback(data.Notices[0].html,uid)
+			callback(data.Notices[0].html, uid)
 		})
 	})
 }
 
-// console.log("start")
-// fee_extractor("b418045", "sarthak@2001", data_writer)
 
-// console.log('end');
 
-module.exports = {fee_extractor:fee_extractor,
-					data_writer: data_writer}
+module.exports = { fee_extractor: fee_extractor, data_writer: data_writer }

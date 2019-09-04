@@ -1,6 +1,6 @@
 const request = require("request")
 // const rp = require('request-promise').defaults({simple:false})
-const login =function(uid, pwd,cb) {
+const login_old =function(uid, pwd,cb) {
 	//request options
 	let option = {
 		url: "https://hib.iiit-bh.ac.in/Hibiscus/Login/auth.php?client=iiit",
@@ -18,7 +18,7 @@ const login =function(uid, pwd,cb) {
 
 	request.post(option, (err, res, html) => {
 		if (!err) {
-			// console.log(res.headers)
+			// console.log(res)
 
 			let cookie = res.headers["set-cookie"][0].slice(0, 36)
 			// console.log(cookie)
@@ -34,4 +34,4 @@ const login =function(uid, pwd,cb) {
 }
 
 
-module.exports = login
+module.exports = login_old
