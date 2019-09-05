@@ -4,9 +4,11 @@ const login_old = require("./login_old")
 const Fee = require("../models/fee")
 // require("../db/mongoose")
 
+
+//TODO : make different function to find student and lock....nned to convert to axios
 const lock_true = async function(uid) {
 	console.log("turning lock to true\n")
-	const fee = await Fee.findOneAndUpdate({ studentID: uid }, { lock: true })
+	await Fee.findOneAndUpdate({ studentID: uid }, { lock: true })
 	// console.log(fee);
 	console.log("time to scrape.....\n")
 	// Fee.updateOne()

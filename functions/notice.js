@@ -1,31 +1,46 @@
 const request = require("request")
 const cheerio = require("cheerio")
 const login_new = require("./login_new")
-const Notice = require('../models/notice')
-require("../db/mongoose")
-//TODO : FIND A WAY TO SAVE ITEMS
-const data_writer = async (data)=>{
-    console.log('hiiii');
-    // data.forEach(element => {
-    //     var notice = new Notice({Notices:{attention:element.attention,date:element.date,id:element.id,id_link:element.id_link,posted_by:element.posted_by,title:element.title}})
-        
-    //     console.log('done');
-        
-   
-    // });
-    for (let index = 0; index < data.length; index++) {
-            var notice = new Notice({Notices:{attention:data[index].attention,date:data[index].date,id:data[index].id,id_link:data[index].id_link,posted_by:data[index].posted_by,title:data[index].title}})
-            await notice.Notices.push(notice)
-            await notice.save()
-            console.log('sad');
-            
-        
-    }
-    
+const Notice_data = require('../models/notice')
+const Lock = require('../models/gloabal_lock')
+
+// require("../db/mongoose")
+
+const lock_true = async function () {
+	console.log('turning lock true');
+	await Lock.findOneAndUpdate({name : "scraper_lock"},{global_lock : true})
+	console.log('time to scrape....');
+	
+}
+
+const data_writer = async ( data )=>{
+
+	console.log(data.length);
+	
+	for (let index = 0; index < data.length; index++) {
+		console.log(index);
+		
+		
+		//V1
+		// let notice = new Notice_data({attention:data[index].attention,date:data[index].date,id:data[index].id,id_link:data[index].id_link,posted_by:data[index].posted_by,title:data[index].title})
+		// await notice.save()
+
+		//V2
+		// Notice_data.update()
+		await Notice_data.update({'id':data[index].id},{$set:{'attention':data[index].attention,'date':data[index].date,'id_link':data[index].id_link,'posted_by':data[index].posted_by,'title':data[index].title}},{upsert: true})
+		// console.log(notice);
+		
+		
+	}
+	//LOCK to false stuff
+	await Lock.findOneAndUpdate({name : "scraper_lock"},{global_lock : false})
+	console.log('done');
+	
 }
 
 
-const notice = function(uid, pwd, cb) {
+const notice = async function(uid, pwd, cb) {
+	await lock_true()
 	login_new(uid, pwd, (cookie) => {
 		let option = {
 			url: "https://hib.iiit-bh.ac.in/m-ums-2.0/app.misc/nb/docList.php",
@@ -84,31 +99,32 @@ const notice = function(uid, pwd, cb) {
 	})
 }
 
+//TODO ; Client side middleware
+
 async function db_creator() {
-    const notice = await Notice.findOne({})
-    console.log(notice);
-    
-    if(!notice){
-        console.log('no notice');
-        const new_notice = new Notice({})
-        await new_notice.save()
-        
-    }
-    else{
-    console.log('notice is threre');
-    }
-    
+	const lock = await Lock.findOne({})
+	if(!lock){
+		await Lock.create({})
+	}
+	else{
+		console.log('lock present');
+		
+	}
+	const notice = await Notice_data.findOne({})
+	if(!notice){
+		await Notice_data.create({})
+
+	}
+	else{
+		console.log('Notice present');
+		
+	}
 }
 
-// notice('b418045','sarthka@2001',(data)=>{
-//     console.log(data);
-    
-// })
 
 
 
-notice('b418018','Barbie17*',data_writer)
    
 
 // db_creator()
-// module.exports = notice
+module.exports = { notice_extractor: notice, data_writer: data_writer }
