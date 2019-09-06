@@ -1,8 +1,20 @@
 const request = require('request')
 const cheerio = require('cheerio')
 const login_new = require('./login_new')
+const ND  =require('../models/notice_data')
+// require('../db/mongoose')
 
-const notice_data = function (uid,pwd,n_id) {
+async function data_writer(notice_data,attachment,n_id) {
+    const now = new Date()
+    await ND.findOneAndUpdate({id:n_id},{last_updated:now,link:attachment,notice_data:notice_data,lock:false})
+
+    console.log('DONE');
+    
+}
+
+const notice_data_extractor =async function (uid,pwd,n_id,cb) {
+    // await db_creator(n_id)
+    await lock_true(n_id)
     login_new(uid,pwd, (cookie)=>{
         let option ={
             url: "https://hib.iiit-bh.ac.in/m-ums-2.0/app.misc/nb/docDet.php?docid="+n_id,
@@ -22,15 +34,30 @@ const notice_data = function (uid,pwd,n_id) {
         console.log(notice_html);
         let attachment = $("a").attr('href')
         if(attachment == 'docList.php'){
-            attachment = ""
+            a_html = ""
+        }
+        else{
+            a_html = 'https://hib.iiit-bh.ac.in/m-ums-2.0'+attachment.slice(5)
         }
         console.log('\n\n\n');
-        console.log(attachment);
-        
-                
+        console.log(a_html);   
+
+        cb(notice_html,a_html,n_id)
     })
 })
+
 }
 
-// notice_data('b418045','sarthak@2001','11216')
-notice_data('b418045','sarthak@2001','11231')
+async function lock_true(n_id) {
+    console.log("turning lock to true\n")
+	await ND.findOneAndUpdate({ id: n_id }, { lock: true })
+	console.log("time to scrape.....\n")
+}
+
+async function db_creator(n_id) {
+    const now = new Date()
+    await ND.create({id:n_id,last_updated:now})
+
+}
+
+module.exports = {notice_data_extractor,data_writer}
