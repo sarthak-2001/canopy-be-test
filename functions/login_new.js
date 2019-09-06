@@ -32,8 +32,3 @@ const login_new =function(uid, pwd,cb) {
 
 }
 module.exports = login_new
-
-// login_new('b418045','sarthak@2001',(S)=>{
-//     console.log('s');
-    
-// })
