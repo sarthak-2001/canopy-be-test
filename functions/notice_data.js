@@ -13,7 +13,6 @@ async function data_writer(notice_data,attachment,n_id) {
 }
 
 const notice_data_extractor =async function (uid,pwd,n_id,cb) {
-    // await db_creator(n_id)
     await lock_true(n_id)
     login_new(uid,pwd, (cookie)=>{
         let option ={
@@ -52,12 +51,6 @@ async function lock_true(n_id) {
     console.log("turning lock to true\n")
 	await ND.findOneAndUpdate({ id: n_id }, { lock: true })
 	console.log("time to scrape.....\n")
-}
-
-async function db_creator(n_id) {
-    const now = new Date()
-    await ND.create({id:n_id,last_updated:now})
-
 }
 
 module.exports = {notice_data_extractor,data_writer}
