@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const feeSchema = new mongoose.Schema({
   studentID: {
     type: String,
-    // unique: true,
     lowercase: true
   },
   data: {
@@ -13,10 +12,7 @@ const feeSchema = new mongoose.Schema({
   last_updated: {
     type: Date
   },
-  lock: {
-    type: Boolean,
-    default: false
-  }
+ 
 });
 
 feeSchema.pre("save", async function(next) {

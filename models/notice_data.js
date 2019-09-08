@@ -1,10 +1,7 @@
 const mongoose = require("mongoose")
 
 const noticeDataSchema = new mongoose.Schema({
-	lock: {
-		type: Boolean,
-		default: false
-	},
+
 	notice_data: {
 		type: String,
 		default: ""
